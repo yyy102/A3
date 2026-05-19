@@ -600,6 +600,7 @@ with tab3:
         INIT_PY   = os.path.join(MODEL_DIR, "__init__.py")
         EXPECTED_MD5 = "b6172d653b041aa0a636526a72f07de1"
         EXPECTED_SIZE = 109885004  # bytes
+        GZ_URL = "https://github.com/RaRe-Technologies/gensim-data/releases/download/glove-twitter-25/glove-twitter-25.gz"
 
         # ── 工具函数：校验 gz 文件完整性 ──────────────────────────────────
         def gz_is_valid(path):
@@ -624,6 +625,21 @@ with tab3:
             return h.hexdigest() == EXPECTED_MD5
 
         # ── Step 1: 修复 information.json 结构 ────────────────────────────
+        # Streamlit Cloud may preserve a broken gensim reader cache
+        # ("glove-twitter-25" without load_data). Loading the raw vectors
+        # directly avoids that reader module entirely.
+        os.makedirs(MODEL_DIR, exist_ok=True)
+        if not gz_is_valid(MODEL_GZ):
+            if os.path.exists(MODEL_GZ):
+                os.remove(MODEL_GZ)
+            urllib.request.urlretrieve(GZ_URL, MODEL_GZ)
+        if gz_is_valid(MODEL_GZ):
+            return KeyedVectors.load_word2vec_format(
+                MODEL_GZ,
+                binary=False,
+                no_header=True,
+            )
+
         os.makedirs(BASE_DIR, exist_ok=True)
         correct_info = {
             "corpora": {},
