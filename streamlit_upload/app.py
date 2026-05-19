@@ -637,7 +637,7 @@ with tab3:
             return KeyedVectors.load_word2vec_format(
                 MODEL_GZ,
                 binary=False,
-                no_header=True,
+                no_header=False,
             )
 
         os.makedirs(BASE_DIR, exist_ok=True)
@@ -681,7 +681,7 @@ with tab3:
             except Exception:
                 pass
             try:
-                return KeyedVectors.load_word2vec_format(MODEL_GZ, binary=False, no_header=True)
+                return KeyedVectors.load_word2vec_format(MODEL_GZ, binary=False, no_header=False)
             except Exception:
                 pass
 
